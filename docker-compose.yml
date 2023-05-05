@@ -13,19 +13,37 @@ services:
       - DB2INST1_PASSWORD=${DB_PASSWORD}
       - LICENSE=accept
     volumes:
-      - ~/database:/database
+      - ./database:/database
     networks:
       - db2_network
 
+  binder:
+    build: ./binder
+    container_name: binder
+    privileged: true
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=testdb
+      - DB_HOST=db2
+      - DB_PORT=50000
+      - LICENSE=accept
+    depends_on:
+      - db2
+    networks:
+      - db2_network
   client:
     build: ./client
     container_name: client
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=testdb
+      - DB_HOST=db2
+      - DB_PORT=50000
       - PYTHONUNBUFFERED=1
     depends_on:
-      - db2
+      - binder
     networks:
       - db2_network
 
