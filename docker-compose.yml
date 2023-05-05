@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db2:
+    build: .
+    container_name: db2
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "50000:50000"
+    environment:
+      - DBNAME=testdb
+      - DB2INST1_PASSWORD=${DB_PASSWORD}
+      - LICENSE=accept
+    volumes:
+      - ~/database:/database
+    networks:
+      - db2_network
+
+  client:
+    build: ./client
+    container_name: client
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - db2
+    networks:
+      - db2_network
+
+networks:
+  db2_network:
+
+
